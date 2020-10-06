@@ -1,0 +1,2 @@
+This is the directory containing the common scripts in the PRS pipeline used for all diseases/phenotypes. 
+* DO NOT RUN * these scripts from this directory. These scripts must be run from the specific disease/phenotype script directory.

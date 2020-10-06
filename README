@@ -1,0 +1,34 @@
+Herein lies the absolute truth for all things for the Polygenic Risk Score (PRS) project.
+
+*** Directory structure ***
+./README = This file
+
+Common directory:
+-----------------
+The common directory contains the data, scripts and files that are common for all diseases in the PRS analysis pipeline.
+
+./common/           = Directory containing common raw data, scripts and files for all diseases.
+
+./common/raw_data/  = Directory containing the common raw data downloaded from various sources.
+
+./common/scripts/   = Directory containing the common scripts in the PRS pipeline used for all diseases/phenotypes. * DO NOT RUN * these scripts from this directory. These scripts must be run from the specific disease/phenotype script directory.
+
+
+Per-disease/phenotype directories:
+----------------------------------
+The per-disease/phenotype directories contain the data, scripts and files specific for the PRS analysis of that disease/phenotype.
+
+./T2D/      = Directory for PRS for Type2 Diabetes
+
+./asthma/   = Directory for PRS for Asthma
+
+./CAD/      = Directory for PRS for Coronary artery disease
+
+Each per-disease directory has the following sub-directories:
+./<disease>/raw_data/       = Directory containing the raw data specific for the analysis of this disease.
+./<disease>/derived_data/   = Directory containing the derived data (modified from raw data) specific for the analysis of this disease.
+./<disease>/scripts/        = Directory containing the scripts specific for the analysis of this disease.
+./<disease>/logs/           = Directory containing the logs for the analysis of this disease.
+./<disease>/output/         = Directory containing the output for the analysis of this disease.
+./<disease>/plots/          = Directory containing the plots for the analysis of this disease.
+./<disease>/results/        = Directory containing the results for the analysis of this disease.
