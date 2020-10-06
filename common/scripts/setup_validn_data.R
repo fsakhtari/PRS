@@ -1,13 +1,10 @@
 ### Setup the validation data for the PRS pipeline ###
 
-# TODO: Change genotype data
-# snp_match(info_snp.ld, validn.map) - 146,335 variants matched. The UKBB genotyped-only data has the fewest #snps of all 4 datasets. Get the genotyped+imputed UKBB data.
-
 
 ### init() ###
 
 # Enable memory profiling
-#Rprof(memory.profiling = TRUE, gc.profiling = TRUE, line.profiling = TRUE)
+# Rprof(memory.profiling = TRUE, gc.profiling = TRUE, line.profiling = TRUE)
 
 # Load packages and variables
 
@@ -19,16 +16,25 @@ PRS_PHENO_DIR <- Sys.getenv("PRS_PHENO_DIR")
 source(paste0(PRS_COMMON_DIR, "/scripts/prs_common.R"))
 
 # The first 10 genetic principal components in the UK Biobank data
-pcs <- setNames(as.list(paste0('f.22009.0.', 1:10)), paste0('PC', 1:10))
+pcs <- setNames(as.list(paste0("f.22009.0.", 1:10)), paste0("PC", 1:10))
 
 # Retrieve command line arguments/options
 opts_spec <- list(
-  make_option(c("--pheno"), type="character", default=NULL, 
-              help="Phenotype for which to compute PRS", metavar="character"),
+  make_option(c("--pheno"),
+    type = "character",
+    default = NULL,
+    help = "Phenotype for which to compute PRS",
+    metavar = "character"
+  ),
 
-  make_option(c("--covariates"), type="list", default=c(list(age='f.21022.0.0', sex='f.31.0.0', ethnicity='f.21000.0.0', bmi='f.21001.0.0'), pcs),
-    help="covariates to use in the association analysis specified in a named list of covariate names and their corresponding UIDs in the UK Biobank data [default \"%default\"]", metavar="named list")
-);
+  make_option(c("--covariates"),
+    type = "list",
+    default = c(list(age = "f.21022.0.0", sex = "f.31.0.0",
+      ethnicity = "f.21000.0.0", bmi = "f.21001.0.0"), pcs),
+    help = "covariates to use in the association analysis specified in a named list of covariate names and their corresponding UIDs in the UK Biobank data [default \"%default\"]",
+    metavar = "named list"
+  )
+)
 opts <- get_opts(opts_spec)
 
 
@@ -40,14 +46,18 @@ opts <- get_opts(opts_spec)
 valdn_out_dir <- paste0(PRS_PHENO_DIR, "/derived_data/validation_data/")
 
 # UK Biobank data
-#ukb_data <- readRDS("/ddn/gs1/project/controlled/EPR/EPR_statgen/akhtarifs/tmp/dataformat_R/ukb_sel.rds")
+# ukb_data <- readRDS("/ddn/gs1/project/controlled/EPR/EPR_statgen/akhtarifs/tmp/dataformat_R/ukb_sel.rds")
 # TODO: move this to ukb dir, use fread2, read rds here
-ukb_data <- read.table("/ddn/gs1/shared/ukbiobank/dataformat_R/ukb41671.tab", header=TRUE, sep="\t")
+ukb_data <- read.table("/ddn/gs1/shared/ukbiobank/dataformat_R/ukb41671.tab",
+  header = TRUE, sep = "\t"
+)
 print("UK Biobank (UKB) survey data :")
 cat("dimensions =", dim(ukb_data))
 print("first 50 column names :")
 print(colnames(ukb_data)[1:50])
-saveRDS(ukb_data, "/ddn/gs1/project/controlled/EPR/EPR_statgen/akhtarifs/tmp/dataformat_R/ukb41671.rds")
+saveRDS(ukb_data,
+  "/ddn/gs1/project/controlled/EPR/EPR_statgen/akhtarifs/tmp/dataformat_R/ukb41671.rds"
+)
 
 
 ## Phenotype and covariate data
@@ -59,44 +69,57 @@ na_strings <- c(-1, -3)
 covars <- as.character(unlist(opts$covariates))
 
 ukb_survey_cc <- ukb_data %>%
-  select(all_of(c('f.eid', opts$pheno, covars))) %>%
+  select(all_of(c("f.eid", opts$pheno, covars))) %>%
   rename(Y = !!opts$pheno) %>%
   rename_at(vars(covars), function(x) names(opts$covariates)) %>%
-  #replace_with_na_all(condition = ~.x %in% na_strings) %>%
-  replace_with_na_at(.vars = c("Y", "ethnicity"), condition = ~.x %in% na_strings) %>%
+  replace_with_na_at(
+    .vars = c("Y", "ethnicity"),
+    condition = ~ .x %in% na_strings
+  ) %>%
   drop_na() %>%
-  # Group the ethnicities into the top-level ethnic group which is represented by the first number in the string
+  # Group the ethnicities into the top-level ethnic group which is represented
+  # by the first number in the string
   mutate(ethnicity = substr(ethnicity, 1, 1)) %>%
   mutate(f.eid = as.integer(f.eid)) %>%
   mutate_at(vars(age, bmi), as.numeric) %>%
   mutate_at(vars(sex, Y, ethnicity), as.factor)
 
-  #  %>%
-  # # TODO: temporary removal of samples/individuals to decrease runtime
-  # sample_n(10000)
-
 print("UKB survey data (complete cases):")
 str(ukb_survey_cc)
 
 # Identify related samples with the phenotype of interest, to remove
-reldness <- read.table('/ddn/gs1/shared/ukbiobank/genotype_data/common_data/ukb57849_rel_s488264.dat', header = TRUE)
-indivs.remove <- ukb_gen_samples_to_remove(data = reldness, ukb_with_data = ukb_survey_cc$f.eid, cutoff = 0.0884)
+reldness <- read.table(
+  "/ddn/gs1/shared/ukbiobank/genotype_data/common_data/ukb57849_rel_s488264.dat",
+  header = TRUE
+)
+indivs.remove <- ukb_gen_samples_to_remove(
+  data = reldness,
+  ukb_with_data = ukb_survey_cc$f.eid,
+  cutoff = 0.0884
+)
 cat("Number of related individuals to remove: ", length(indivs.remove), "\n")
 
-ukb_survey_cc <- ukb_survey_cc %>% anti_join(data.frame(f.eid = indivs.remove), by = 'f.eid')
+ukb_survey_cc <- ukb_survey_cc %>%
+  anti_join(data.frame(f.eid = indivs.remove), by = "f.eid")
 cat("UKB dimensions after removing related individuals:", dim(ukb_survey_cc), "\n")
 
 # Save the WGS IDs for complete cases in plink's required format
-indivs_keep <- paste0(valdn_out_dir, 'indivs.keep')
-write.table(data.frame(FID = ukb_survey_cc$f.eid, IID = ukb_survey_cc$f.eid), file = indivs_keep, quote = FALSE, row.names = FALSE, col.names = FALSE)
+indivs_keep <- paste0(valdn_out_dir, "indivs.keep")
+write.table(data.frame(FID = ukb_survey_cc$f.eid, IID = ukb_survey_cc$f.eid),
+  file = indivs_keep, quote = FALSE, row.names = FALSE, col.names = FALSE
+)
 
 
 ## Genotype data
 
 # Filter genotype data + only keep genotype samples for complete cases
-bedfile <- snp_plinkQC(plink.path = '/ddn/gs1/home/akhtarifs/software/plink2',prefix.in = "/ddn/gs1/shared/ukbiobank/genotype_data/genotypes/all_chromosomes/ukb_cal_all_v2",
+bedfile <- snp_plinkQC(
+  plink.path = "/ddn/gs1/home/akhtarifs/software/plink2",
+  prefix.in = "/ddn/gs1/shared/ukbiobank/genotype_data/genotypes/all_chromosomes/ukb_cal_all_v2",
   prefix.out = paste0(valdn_out_dir, "ukb_geno"),
-  maf = 0.01, geno = 0.01, mind = 0.1, hwe = 1e-10, autosome.only = TRUE,extra.options = paste0(" --snps-only --keep ", indivs_keep))
+  maf = 0.01, geno = 0.01, mind = 0.1, hwe = 1e-10, autosome.only = TRUE,
+  extra.options = paste0(" --snps-only --keep ", indivs_keep)
+)
 
 # Read from filtered bed/bim/fam PLINK files. This generates .bk and .rds files.
 rdsfile <- snp_readBed2(bedfile, ncores = NCORES)
@@ -108,11 +131,11 @@ str(validn.bigSNP, max.level = 2, strict.width = "cut")
 
 # Impute missing genotypes, since missing values are not allowed when computing PRS
 print("Imputing missing genotypes")
-validn.bigSNP$genotypes <- snp_fastImputeSimple(validn.bigSNP$genotypes, method= "random")
+validn.bigSNP$genotypes <- snp_fastImputeSimple(validn.bigSNP$genotypes,
+  method = "random"
+)
 # Save the modified bigSNP object to the RDS file
 rdsfile <- snp_save(validn.bigSNP)
-
-# TODO: rm the bed/bim/fam files created above and do snp_writebed() to create new ones with the imputed genotypes.
 
 # Complete cases with genotype + phenotype data
 cc.iids <- validn.bigSNP$fam$sample.ID
@@ -120,7 +143,7 @@ cc.iids <- validn.bigSNP$fam$sample.ID
 ukb_survey_cc <- ukb_survey_cc %>% filter(f.eid %in% cc.iids)
 cat("Final UKB survey data dimensions:", dim(ukb_survey_cc), "\n")
 
-saveRDS(ukb_survey_cc, file = paste0(valdn_out_dir, 'ukb_pheno.rds'))
+saveRDS(ukb_survey_cc, file = paste0(valdn_out_dir, "ukb_pheno.rds"))
 
 
 ## Summarize data
@@ -129,14 +152,14 @@ cat("\n=== Validation data summary (after QC & filtering) ===\n")
 
 print("Phenotype and covariate data from UK Biobank")
 num_cases <- sum(ukb_survey_cc$Y == 1)
-num_controls = sum(ukb_survey_cc$Y == 0)
-num_total = nrow(ukb_survey_cc)
+num_controls <- sum(ukb_survey_cc$Y == 0)
+num_total <- nrow(ukb_survey_cc)
 
 cat("Phenotype = ", opts$pheno, "\n")
 cat("Cases = ", num_cases, "\n")
 cat("Controls = ", num_controls, "\n")
 cat("Total = ", nrow(ukb_survey_cc), "\n")
-cat("%Cases = ", num_cases/num_total, "\n")
+cat("%Cases = ", num_cases / num_total, "\n")
 
 print("Summary of 'age':")
 print(summary(ukb_survey_cc$age))
@@ -163,4 +186,4 @@ cat("Minor allele frequency (MAF) range = ", range(maf, na.rm = TRUE), "\n")
 ### cleanup() ###
 
 # Turn off memory profiling
-#Rprof(NULL)
+# Rprof(NULL)

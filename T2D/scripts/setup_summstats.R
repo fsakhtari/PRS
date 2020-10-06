@@ -1,7 +1,9 @@
 ### Setup the summary statistics dataset for the PRS pipeline ###
 
 # TODO:
-# 1. From https://www.nature.com/articles/ng.3406#Sec8 under "We then applied the following filters (implemented in the script munge_summstats.py included with ldsc):"
+# 1. From https://www.nature.com/articles/ng.3406#Sec8 under "We then applied
+# the following filters (implemented in the script munge_summstats.py included
+# with ldsc):"
 # 2. QC = remove snps with OR/beta/CI/pvalue = NA, etc....
 
 
@@ -48,7 +50,7 @@ print("Summary statistics after renaming columns:")
 str(summstats)
 
 # write formatted summstats file
-fmtd_file <- paste0(PRS_PHENO_DIR, '/derived_data/summary_stats/summstats_fmtd.txt')
+fmtd_file <- paste0(PRS_PHENO_DIR, "/derived_data/summary_stats/summstats_fmtd.txt")
 bigreadr::fwrite2(summstats, file = fmtd_file)
 
 cat("\n=== Summary statistics information ===\n")
