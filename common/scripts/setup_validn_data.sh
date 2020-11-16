@@ -1,7 +1,8 @@
 #!/bin/bash
 
-#SBATCH --mem=400g
 #SBATCH --partition=discovery
+#SBATCH --mem=500g
+#SBATCH --exclusive
 #SBATCH --mail-user=akhtarifs@nih.gov
 #SBATCH --mail-type=END, FAIL
 

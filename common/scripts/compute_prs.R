@@ -69,6 +69,10 @@ opts <- get_opts(opts_spec)
 # Directory to save output files to
 out_dir <- paste0(PRS_PHENO_DIR, "/output/")
 
+# Don't use all the cores, since we have multiple tasks (one for each
+# chromosome) per node
+NCORES <- min(10, NCORES)
+
 # Matched summary statistics data
 matched_summstats <- bigreadr::fread2(opts$summstats_matched)
 print("Summary statistics data matched across all datasets:")
@@ -100,8 +104,10 @@ str(test.bigSNP, max.level = 2, strict.width = "cut")
 
 # indices in the matched summary statistics data
 ind.chr.ss <- which(matched_summstats$chr == opts$chr)
-print(sprintf("Chromosome %d : Number of SNPs in matched summary statistics = %d",
-  opts$chr, length(ind.chr.ss)))
+print(sprintf(
+  "Chromosome %d : Number of SNPs in matched summary statistics = %d",
+  opts$chr, length(ind.chr.ss)
+))
 
 df_beta <- matched_summstats[ind.chr.ss, c("beta.summstats", "beta_se", "n_eff")]
 df_beta <- df_beta %>% rename(beta = beta.summstats)
@@ -109,15 +115,18 @@ df_beta <- df_beta %>% rename(beta = beta.summstats)
 # indices in the LDref panel genotype data
 ind.chr.ldref <- matched_summstats$`_NUM_ID_.ldref`[ind.chr.ss]
 corr_mat <- snp_cor(
-  ldref.bigSNP$genotypes, ind.col = ind.chr.ldref,
+  ldref.bigSNP$genotypes,
+  ind.col = ind.chr.ldref,
   ncores = NCORES,
   infos.pos = as.vector(unlist(matched_summstats[ind.chr.ss, "genetic.pos"])),
   size = 3 / 1000, alpha = 0.9
-  )
+)
 corr_sfbm <- bigsparser::as_SFBM(as(corr_mat, "dgCMatrix"))
 
-cat("Chromosome", opts$chr, ": Dimensions of SNP correlation matrix = ",
-    dim(corr_mat), "\n")
+cat(
+  "Chromosome", opts$chr, ": Dimensions of SNP correlation matrix = ",
+  dim(corr_mat), "\n"
+)
 if (anyNA(corr_mat)) {
   stop("corr_mat contains NAs")
 } else {
@@ -149,7 +158,7 @@ print(paste("Number of parameter combinations =", nrow(params)))
 # Adjust betas for each parameter combination
 ldref.beta_grid <- snp_ldpred2_grid(
   corr = corr_sfbm, df_beta = df_beta, grid_param = params, ncores = NCORES
-  )
+)
 
 write.table(
   ldref.beta_grid, paste0(out_dir, "ldref_adjbetas_na_chr", opts$chr, ".txt"),
@@ -169,7 +178,13 @@ ldref.beta_grid <- ldref.beta_grid[, valid_param.rows]
 params <- params[valid_param.rows, ]
 
 # Check if there are other NAs in the beta_grid
-if (anyNA(ldref.beta_grid)) stop("Adjusted betas matrix still contains NAs.")
+# if (anyNA(ldref.beta_grid)) stop("Adjusted betas matrix still contains NAs.")
+# For chromosome 6, some columns (adjusted beta vectors) still contain some NAs. For now, remove these columns.
+bad_cols <- (1:ncol(ldref.beta_grid))[colSums(is.na(ldref.beta_grid)) != 0]
+print(paste("Still NA columns:", bad_cols))
+good_rows <- setdiff(1:nrow(params), bad_cols)
+ldref.beta_grid <- ldref.beta_grid[, good_rows]
+params <- params[good_rows, ]
 
 print(paste("Number of 'non-NA' parameter combinations =", nrow(params)))
 print("'Non-NA' parameter grid:")
@@ -180,7 +195,7 @@ print(params)
 std_devs <- apply(ldref.beta_grid, 2, sd)
 sane <- (1:ncol(ldref.beta_grid))[abs(std_devs - median(std_devs)) < 3 * mad(std_devs)]
 
-print(
+cat(
   "Number of parameter combinations that gave insane beta values =",
   length(setdiff(1:nrow(params), sane)), "\n"
 )
@@ -211,7 +226,7 @@ pred_grid <- big_prodMat(
   validn.bigSNP$genotypes,
   validn.beta_grid,
   ind.col = matched_summstats$`_NUM_ID_.validn`[ind.chr.ss]
-  )
+)
 
 write.table(
   pred_grid, paste0(out_dir, "validn_prsgrid_chr", opts$chr, ".txt"),
@@ -293,6 +308,12 @@ write.table(
 # (beta.test from snp_match()) are relative to the LD reference panel.
 ldref.best_betas <- ldref.beta_grid[, best_id]
 
+write.table(
+  set_names(data.frame(ldref.best_betas), paste0("chr", opts$chr)),
+  paste0(out_dir, "ldref_bestbetas_chr", opts$chr, ".txt"),
+  quote = FALSE, row.names = FALSE
+)
+
 # Change signs for the betas for the test genotypes
 test.beta_vec <- ldref.best_betas * matched_summstats$beta.test[ind.chr.ss]
 
@@ -306,7 +327,7 @@ write.table(
 prs_test <- big_prodVec(
   test.bigSNP$genotypes, test.beta_vec,
   ind.col = matched_summstats$`_NUM_ID_.test`[ind.chr.ss]
-  )
+)
 
 write.table(
   set_names(data.frame(prs_test), paste0("chr", opts$chr)),

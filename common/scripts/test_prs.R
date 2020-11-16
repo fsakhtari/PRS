@@ -78,8 +78,10 @@ compute_total_prs <- function(dataset_type) {
     full.names = TRUE
   )
 
-  cat("\n==Computing and testing total PRS for", dataset_type,
-      "dataset from the following files ==\n")
+  cat(
+    "\n==Computing and testing total PRS for", dataset_type,
+    "dataset from the following files ==\n"
+  )
   print(prs_files)
 
   # Put the per-chromosome PRS into one dataframe
@@ -96,30 +98,28 @@ compute_total_prs <- function(dataset_type) {
 
   ## Test the association of total PRS with phenotype
 
-  # Create dataframe for logistic regression
+  # Create PRS dataframe
   prs_all[, id_var] <- geno_data$fam$sample.ID
-  prs_total <- prs_all[, c(id_var, "PRS")]
-  glm_df <- merge(pheno_data, prs_total, by = id_var)
+  prs_total <- merge(pheno_data, prs_all[, c(id_var, "PRS")], by = id_var)
 
   cat("PRS dataframe for", dataset_type, "dataset:\n")
-  str(glm_df)
-  write.table(glm_df,
+  str(prs_total)
+  write.table(prs_total,
     paste0(PRS_PHENO_DIR, "/output/", dataset_type, "_prs_df.txt"),
     row.names = FALSE, quote = FALSE
   )
 
   # TODO: temporarily using race in lieu of PCs. Grouping race into 3 races.
   if (dataset_type == "test") {
-    glm_df <- glm_df %>%
+    prs_total <- prs_total %>%
       mutate(race = recode(race, `3` = "black", `5` = "white", .default = "other"))
     print("Test survey data after recoding race:")
-    xtabs(~ Y + race, data = glm_df)
-    str(glm_df)
+    str(prs_total)
   }
 
   # Remove columns not used in glm
   remove_cols <- c("f.eid", "ethnicity", "epr_number", "Sample_ID")
-  glm_df <- glm_df %>% select(-any_of(remove_cols))
+  glm_df <- prs_total %>% select(-any_of(remove_cols))
 
   # Logistic regression of phenotype (Y) ~ covariates + PRS
   glm_out <- do_glm(
@@ -143,7 +143,8 @@ compute_total_prs <- function(dataset_type) {
   varexp_prs <- lrm_full$stats["R2"] - lrm_reduced$stats["R2"]
   cat(
     "Proportion of variance explained by PRS using Nagelkerke’s pseudo-R2 metric =",
-    varexp_prs, "\n")
+    varexp_prs, "\n"
+  )
 
 
   ## Flipping the independent and dependent variables
@@ -161,13 +162,22 @@ compute_total_prs <- function(dataset_type) {
 
   pdf(paste0(PRS_PHENO_DIR, "/plots/", dataset_type, "_prs_plots.pdf"))
 
-  plot_df <- glm_df
+  plot_df <- prs_total
   # Scale/standardize the PRS
   plot_df$PRS_scaled <- scale(plot_df$PRS, scale = TRUE, center = TRUE)
   # PRS percentile
   plot_df$PRS_ptile <- ntile(plot_df$PRS, 100)
 
-  # Boxplots of PRS ~ Y (phenotype)
+  # Density plot to show PRS distribution
+  print(
+    ggplot(data = plot_df, aes(x = PRS_scaled)) +
+      geom_density(outline.type = "both") +
+      ylab("Density") +
+      xlab("Scaled PRS") +
+      theme_classic()
+  )
+
+  # Boxplots of PRS ~ Y (disease/phenotype)
   boxplot_prs(plot_data = plot_df, prs = "PRS")
   boxplot_prs(plot_data = plot_df, prs = "PRS_scaled")
   boxplot_prs(plot_data = plot_df, prs = "PRS_ptile")
@@ -177,34 +187,65 @@ compute_total_prs <- function(dataset_type) {
     group_by(PRS_ptile) %>%
     summarise(prev = mean(as.numeric(levels(Y))[Y]))
 
-  ggplot(
-    data = prev_ptile,
-    aes(x = PRS_ptile, y = prev * 100, colour = PRS_ptile)
-  ) +
-    geom_point() +
-    scale_color_gradientn(colours = brewer.pal(n = 9, name = "Blues")) +
-    ylab("Disease prevalence %") +
-    xlab("PRS percentile") +
-    theme_classic()
+  print(
+    ggplot(
+      data = prev_ptile,
+      aes(x = PRS_ptile, y = prev * 100, colour = PRS_ptile)
+    ) +
+      geom_point() +
+      scale_color_gradientn(colours = brewer.pal(n = 9, name = "Blues")) +
+      ylab("Disease prevalence %") +
+      xlab("PRS percentile") +
+      theme_classic()
+  )
+
+  # PRS ~ race/ethnicity plot to see racial differences in PRS
+  race_var <- NULL
+  if (dataset_type == "validn") {
+    race_var <- "ethnicity"
+  }
+  else if (dataset_type == "test") {
+    race_var <- "race"
+  }
+
+  print(
+    ggplot(
+      data = plot_df,
+      aes_string(x = race_var, y = "PRS_scaled", fill = race_var)
+    ) +
+      geom_boxplot() +
+      scale_fill_brewer(palette = "Blues") +
+      ylab("PRS_scaled") +
+      xlab(race_var) +
+      theme_classic() +
+      theme(legend.position = "none") +
+      theme(
+        plot.title = element_text(face = "bold", size = 14),
+        axis.text = element_text(face = "bold", size = 14),
+        axis.title = element_text(face = "bold", size = 14)
+      )
+  )
 
   dev.off()
 }
 
-# Wrapper function to make boxplots of PRS ~ Y (phenotype)
+# Wrapper function to make boxplots of PRS ~ Y (disease/phenotype)
 # prs = character(); column name of the PRS value to plot
 boxplot_prs <- function(plot_data, prs) {
-  ggplot(data = plot_data, aes_string(x = "Y", y = prs, fill = "Y")) +
-    geom_boxplot() +
-    scale_fill_brewer(palette = "Paired") +
-    ylab(prs) +
-    xlab("Disease phenotype") +
-    theme_classic() +
-    theme(legend.position = "none") +
-    theme(
-      plot.title = element_text(face = "bold", size = 14),
-      axis.text = element_text(face = "bold", size = 14),
-      axis.title = element_text(face = "bold", size = 14)
-    )
+  print(
+    ggplot(data = plot_data, aes_string(x = "Y", y = prs, fill = "Y")) +
+      geom_boxplot() +
+      scale_fill_brewer(palette = "Paired") +
+      ylab(prs) +
+      xlab("Disease phenotype") +
+      theme_classic() +
+      theme(legend.position = "none") +
+      theme(
+        plot.title = element_text(face = "bold", size = 14),
+        axis.text = element_text(face = "bold", size = 14),
+        axis.title = element_text(face = "bold", size = 14)
+      )
+  )
 }
 
 
@@ -233,7 +274,30 @@ print("Test survey data:")
 str(test.survey)
 
 
-## Compute and test total PRS
+# Compute the proportion of SNPs used in PRS computation across the genome
+
+# Files containing the best betas per chromosome
+beta_files <- list.files(
+  path = paste0(PRS_PHENO_DIR, "/output"),
+  pattern = "test_bestbetas_chr\\d*.txt",
+  full.names = TRUE
+)
+
+all_betas <- NULL
+for (f in beta_files) {
+  df <- read.table(f, header = TRUE)
+  all_betas <- c(all_betas, df[, 1])
+}
+sparsity <- mean(all_betas == 0)
+cat("Total number of SNPs input to LDpred = ", length(all_betas), "\n")
+cat(
+  "Proportion of SNPs used in PRS computation (i.e. SNPs with non-zero beta
+  values) =",
+  (1 - sparsity), "\n"
+)
+
+
+## Compute and test total PRS for:
 
 # Validation data
 compute_total_prs(dataset_type = "validn")

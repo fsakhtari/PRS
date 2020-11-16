@@ -8,8 +8,9 @@ running
   To avoid this message, set the 'cran_repo' argument to a CRAN
   mirror URL (see https://cran.r-project.org/mirrors.html) or set
   'quiet = TRUE'.
+Warning: replacing previous import ‘vctrs::data_frame’ by ‘tibble::data_frame’ when loading ‘dplyr’
 [1] "num cores available =  96"
-[1] "using 10 cores"
+[1] "using 86 cores"
 [1] "Command-line options:"
 $validn_geno
 [1] "../derived_data/validation_data/ukb_geno.rds"
@@ -33,39 +34,40 @@ List of 3
   ..  add_columns, as.FBM, bm, bm.desc, check_dimensions,
   ..  check_write_permissions, copy#envRefClass, initialize, initialize#FBM,
   ..  save, show#envRefClass, show#FBM
- $ fam      :'data.frame':	9979 obs. of  6 variables:
-  ..$ family.ID  : int [1:9979] 1000077 1000336 1001039 1001085 1001865 100218..
-  ..$ sample.ID  : int [1:9979] 1000077 1000336 1001039 1001085 1001865 100218..
-  ..$ paternal.ID: int [1:9979] 0 0 0 0 0 0 0 0 0 0 ...
-  ..$ maternal.ID: int [1:9979] 0 0 0 0 0 0 0 0 0 0 ...
-  ..$ sex        : int [1:9979] 1 1 2 2 1 1 2 2 2 1 ...
-  ..$ affection  : int [1:9979] -9 -9 -9 -9 -9 -9 -9 -9 -9 -9 ...
- $ map      :'data.frame':	542137 obs. of  6 variables:
-  ..$ chromosome  : int [1:542137] 1 1 1 1 1 1 1 1 1 1 ...
-  ..$ marker.ID   : chr [1:542137] "rs3131972" "rs12184325" "rs3131962" "rs12"..
-  ..$ genetic.dist: int [1:542137] 0 0 0 0 0 0 0 0 0 0 ...
-  ..$ physical.pos: int [1:542137] 752721 754105 756604 768448 772927 779322 8..
-  ..$ allele1     : chr [1:542137] "A" "T" "A" "A" ...
-  ..$ allele2     : chr [1:542137] "G" "C" "G" "G" ...
+ $ fam      :'data.frame':	440757 obs. of  6 variables:
+  ..$ family.ID  : int [1:440757] 1000014 1000023 1000030 1000041 1000059 1000..
+  ..$ sample.ID  : int [1:440757] 1000014 1000023 1000030 1000041 1000059 1000..
+  ..$ paternal.ID: int [1:440757] 0 0 0 0 0 0 0 0 0 0 ...
+  ..$ maternal.ID: int [1:440757] 0 0 0 0 0 0 0 0 0 0 ...
+  ..$ sex        : int [1:440757] 2 1 1 1 2 2 1 2 1 1 ...
+  ..$ affection  : int [1:440757] -9 -9 -9 -9 -9 -9 -9 -9 -9 -9 ...
+ $ map      :'data.frame':	443200 obs. of  6 variables:
+  ..$ chromosome  : int [1:443200] 1 1 1 1 1 1 1 1 1 1 ...
+  ..$ marker.ID   : chr [1:443200] "rs79373928" "rs4970383" "rs4970382" "rs95"..
+  ..$ genetic.dist: int [1:443200] 0 0 0 0 0 0 0 0 0 0 ...
+  ..$ physical.pos: int [1:443200] 801536 838555 840753 846864 849998 850780 8..
+  ..$ allele1     : chr [1:443200] "G" "A" "C" "C" ...
+  ..$ allele2     : chr [1:443200] "T" "C" "T" "G" ...
  - attr(*, "class")= chr "bigSNP"
 [1] "Validation survey data:"
-'data.frame':	9979 obs. of  16 variables:
- $ f.eid    : int  1211349 1422113 3854721 4514511 1102704 4983691 4590156 1067476 2091462 4780235 ...
- $ Y        : Factor w/ 2 levels "0","1": 1 1 1 2 1 1 2 1 1 1 ...
- $ age      : num  44 66 58 52 60 43 62 63 46 67 ...
- $ sex      : Factor w/ 2 levels "0","1": 2 1 1 1 1 1 2 2 1 1 ...
- $ ethnicity: Factor w/ 6 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 1 1 ...
- $ bmi      : num  18.7 24.6 27.3 25.2 34.8 ...
- $ PC1      : num  -15 -11.9 -14.4 -12.9 -11 ...
- $ PC2      : num  5.19 3.08 3.08 5.44 5.18 ...
- $ PC3      : num  -3.15 -3.54 -4.53 -2.56 -2.45 ...
- $ PC4      : num  -2.25 4.7 4.39 -2.3 2.41 ...
- $ PC5      : num  -2.367 -0.554 -3.001 -0.549 -3.34 ...
- $ PC6      : num  -1.376 1.337 1.855 -0.133 2.141 ...
- $ PC7      : num  -0.686 -1.203 1.077 1.557 -0.944 ...
- $ PC8      : num  -0.361 -0.253 -2.356 -0.883 -2.011 ...
- $ PC9      : num  2.9326 -2.064 1.0568 1.199 0.0101 ...
- $ PC10     : num  2.37 0.15 1.655 0.534 1.335 ...
+Classes ‘data.table’ and 'data.frame':	440757 obs. of  16 variables:
+ $ f.eid    : int  1000014 1000023 1000030 1000041 1000059 1000062 1000077 1000086 1000095 1000100 ...
+ $ Y        : Factor w/ 2 levels "0","1": 1 1 1 1 2 1 1 1 1 1 ...
+ $ age      : num  69 60 59 55 64 54 53 69 44 69 ...
+ $ sex      : Factor w/ 2 levels "0","1": 1 2 2 2 1 1 2 1 2 2 ...
+ $ ethnicity: Factor w/ 6 levels "1","2","3","4",..: 1 6 1 1 4 1 1 1 2 1 ...
+ $ bmi      : num  29.1 29.6 25.3 29.9 41.7 ...
+ $ PC1      : num  -15.2244 19.2127 0.0657 -15.7492 351.468 ...
+ $ PC2      : num  6.66 -10.1 -2.29 3.88 70.09 ...
+ $ PC3      : num  -5.57 24.43 6.96 -2.7 -6 ...
+ $ PC4      : num  0.125 -80.869 -20.936 2.32 4.601 ...
+ $ PC5      : num  8.25 11.91 -5.1 1.81 1.42 ...
+ $ PC6      : num  -4.348 -10.567 5.065 -1.5 0.383 ...
+ $ PC7      : num  -0.8444 -23.7286 -14.4456 -2.2846 0.0965 ...
+ $ PC8      : num  1.13 -13.48 5.51 -2.21 -1.08 ...
+ $ PC9      : num  2.633 0.136 -0.789 -6.59 -1.11 ...
+ $ PC10     : num  -2.743 3.489 -1.562 2.109 -0.904 ...
+ - attr(*, ".internal.selfref")=<externalptr> 
 [1] "Test genotype data:"
 List of 3
  $ genotypes:Reference class 'FBM.code256' [package "bigstatsr"] with 15 fields
@@ -89,14 +91,17 @@ List of 3
   ..$ allele2     : chr [1:9615149] "G" "G" "C" "G" ...
  - attr(*, "class")= chr "bigSNP"
 [1] "Test survey data:"
-tibble [3,017 × 7] (S3: tbl_df/tbl/data.frame)
- $ epr_number    : num [1:3017] 100529 100550 100613 100628 100645 ...
- $ Sample_ID     : chr [1:3017] "SM-JKH3K" "SM-JJH2N" "SM-JKH3L" "SM-JKH3M" ...
- $ age_derived   : num [1:3017] 81 68 85 77 77 47 68 81 77 54 ...
- $ gender        : Factor w/ 2 levels "0","1": 1 1 2 2 1 2 2 2 1 2 ...
- $ he_bmi_derived: num [1:3017] 24 33 27.4 27.1 29.1 27.6 21 33 30.5 33 ...
- $ race          : Factor w/ 6 levels "1","2","3","4",..: 5 5 5 5 5 6 5 5 5 3 ...
- $ Y             : Factor w/ 2 levels "0","1": 1 2 1 1 1 1 1 2 1 1 ...
+'data.frame':	3017 obs. of  7 variables:
+ $ epr_number    : num  11 28 41 45 59 76 81 84 86 87 ...
+ $ Sample_ID     : chr  "SM-JKH2X" "SM-JKH2Y" "SM-JKH2Z" "SM-JKH31" ...
+ $ age_derived   : num  70 48 61 70 68 71 95 44 65 45 ...
+ $ gender        : Factor w/ 2 levels "0","1": 1 1 2 2 2 2 2 1 2 2 ...
+ $ race          : Factor w/ 6 levels "1","2","3","4",..: 5 5 5 5 5 5 5 5 5 5 ...
+ $ he_bmi_derived: num  30.5 24 24.5 21.1 46.3 22.9 23.2 27.2 21.7 21.5 ...
+ $ Y             : Factor w/ 2 levels "0","1": 1 1 1 1 1 1 1 1 1 1 ...
+Total number of SNPs input to LDpred =  121848 
+Proportion of SNPs used in PRS computation (i.e. SNPs with non-zero beta
+  values) = 0.7255269 
 
 ==Computing and testing total PRS for validn dataset from the following files ==
  [1] "../output/validn_prs_chr1.txt"  "../output/validn_prs_chr10.txt"
@@ -111,47 +116,50 @@ tibble [3,017 × 7] (S3: tbl_df/tbl/data.frame)
 [19] "../output/validn_prs_chr6.txt"  "../output/validn_prs_chr7.txt" 
 [21] "../output/validn_prs_chr8.txt"  "../output/validn_prs_chr9.txt" 
 PRS dataframe for validn dataset:
-'data.frame':	9979 obs. of  17 variables:
- $ f.eid    : int  1000077 1000336 1001039 1001085 1001865 1002185 1002341 1002610 1002738 1003218 ...
- $ Y        : Factor w/ 2 levels "0","1": 1 1 1 1 1 1 1 1 1 1 ...
- $ age      : num  53 65 42 64 45 67 54 59 56 66 ...
- $ sex      : Factor w/ 2 levels "0","1": 2 2 1 1 2 2 1 1 1 2 ...
- $ ethnicity: Factor w/ 6 levels "1","2","3","4",..: 1 1 1 1 3 1 1 1 1 1 ...
- $ bmi      : num  26.1 24.8 24.8 21.9 28.5 ...
- $ PC1      : num  -12.7 -13.1 -12.1 -11.7 59.9 ...
- $ PC2      : num  4.419 3.54 4.457 0.455 -87.994 ...
- $ PC3      : num  -1.737 -2.846 -0.965 -2.611 70.632 ...
- $ PC4      : num  -4.93 1.68 2.59 3.86 15.05 ...
- $ PC5      : num  -2.575 -9.526 5.624 2.627 -0.294 ...
- $ PC6      : num  2.419 -1.017 -0.65 -0.587 1.963 ...
- $ PC7      : num  2.4 1.606 0.951 1.379 -3.506 ...
- $ PC8      : num  2.091 -4.536 -0.279 0.219 5.991 ...
- $ PC9      : num  -1.582 4.122 0.435 1.802 2.756 ...
- $ PC10     : num  -1.908 1.711 0.622 -3.861 18.884 ...
- $ PRS      : num  1.0326 1.0998 0.1243 -0.0619 1.2902 ...
+Classes ‘data.table’ and 'data.frame':	440757 obs. of  17 variables:
+ $ f.eid    : int  1000014 1000023 1000030 1000041 1000059 1000062 1000077 1000086 1000095 1000100 ...
+ $ Y        : Factor w/ 2 levels "0","1": 1 1 1 1 2 1 1 1 1 1 ...
+ $ age      : num  69 60 59 55 64 54 53 69 44 69 ...
+ $ sex      : Factor w/ 2 levels "0","1": 1 2 2 2 1 1 2 1 2 2 ...
+ $ ethnicity: Factor w/ 6 levels "1","2","3","4",..: 1 6 1 1 4 1 1 1 2 1 ...
+ $ bmi      : num  29.1 29.6 25.3 29.9 41.7 ...
+ $ PC1      : num  -15.2244 19.2127 0.0657 -15.7492 351.468 ...
+ $ PC2      : num  6.66 -10.1 -2.29 3.88 70.09 ...
+ $ PC3      : num  -5.57 24.43 6.96 -2.7 -6 ...
+ $ PC4      : num  0.125 -80.869 -20.936 2.32 4.601 ...
+ $ PC5      : num  8.25 11.91 -5.1 1.81 1.42 ...
+ $ PC6      : num  -4.348 -10.567 5.065 -1.5 0.383 ...
+ $ PC7      : num  -0.8444 -23.7286 -14.4456 -2.2846 0.0965 ...
+ $ PC8      : num  1.13 -13.48 5.51 -2.21 -1.08 ...
+ $ PC9      : num  2.633 0.136 -0.789 -6.59 -1.11 ...
+ $ PC10     : num  -2.743 3.489 -1.562 2.109 -0.904 ...
+ $ PRS      : num  0.334 0.17 0.66 0.248 0.619 ...
+ - attr(*, ".internal.selfref")=<externalptr> 
+ - attr(*, "sorted")= chr "f.eid"
 [1] "In function do_glm() :"
 [1] "data frame for glm model:"
-'data.frame':	9979 obs. of  15 variables:
- $ Y   : Factor w/ 2 levels "0","1": 1 1 1 1 1 1 1 1 1 1 ...
- $ age : num  53 65 42 64 45 67 54 59 56 66 ...
- $ sex : Factor w/ 2 levels "0","1": 2 2 1 1 2 2 1 1 1 2 ...
- $ bmi : num  26.1 24.8 24.8 21.9 28.5 ...
- $ PC1 : num  -12.7 -13.1 -12.1 -11.7 59.9 ...
- $ PC2 : num  4.419 3.54 4.457 0.455 -87.994 ...
- $ PC3 : num  -1.737 -2.846 -0.965 -2.611 70.632 ...
- $ PC4 : num  -4.93 1.68 2.59 3.86 15.05 ...
- $ PC5 : num  -2.575 -9.526 5.624 2.627 -0.294 ...
- $ PC6 : num  2.419 -1.017 -0.65 -0.587 1.963 ...
- $ PC7 : num  2.4 1.606 0.951 1.379 -3.506 ...
- $ PC8 : num  2.091 -4.536 -0.279 0.219 5.991 ...
- $ PC9 : num  -1.582 4.122 0.435 1.802 2.756 ...
- $ PC10: num  -1.908 1.711 0.622 -3.861 18.884 ...
- $ PRS : num  1.0326 1.0998 0.1243 -0.0619 1.2902 ...
+Classes ‘data.table’ and 'data.frame':	440757 obs. of  15 variables:
+ $ Y   : Factor w/ 2 levels "0","1": 1 1 1 1 2 1 1 1 1 1 ...
+ $ age : num  69 60 59 55 64 54 53 69 44 69 ...
+ $ sex : Factor w/ 2 levels "0","1": 1 2 2 2 1 1 2 1 2 2 ...
+ $ bmi : num  29.1 29.6 25.3 29.9 41.7 ...
+ $ PC1 : num  -15.2244 19.2127 0.0657 -15.7492 351.468 ...
+ $ PC2 : num  6.66 -10.1 -2.29 3.88 70.09 ...
+ $ PC3 : num  -5.57 24.43 6.96 -2.7 -6 ...
+ $ PC4 : num  0.125 -80.869 -20.936 2.32 4.601 ...
+ $ PC5 : num  8.25 11.91 -5.1 1.81 1.42 ...
+ $ PC6 : num  -4.348 -10.567 5.065 -1.5 0.383 ...
+ $ PC7 : num  -0.8444 -23.7286 -14.4456 -2.2846 0.0965 ...
+ $ PC8 : num  1.13 -13.48 5.51 -2.21 -1.08 ...
+ $ PC9 : num  2.633 0.136 -0.789 -6.59 -1.11 ...
+ $ PC10: num  -2.743 3.489 -1.562 2.109 -0.904 ...
+ $ PRS : num  0.334 0.17 0.66 0.248 0.619 ...
+ - attr(*, ".internal.selfref")=<externalptr> 
 NULL
 [1] "Fitting GLM model:"
 Y ~ age + sex + bmi + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + 
     PC8 + PC9 + PC10 + PRS
-<environment: 0x4eb3c38>
+<environment: 0x1072b6a8>
 [1] "GLM model summary:"
 
 Call:
@@ -160,109 +168,113 @@ glm(formula = glm_formula, family = "binomial", data = glm_df,
 
 Deviance Residuals: 
     Min       1Q   Median       3Q      Max  
--1.9469  -0.3344  -0.2269  -0.1477   3.4170  
+-3.0818  -0.3428  -0.2275  -0.1456   3.7344  
 
 Coefficients:
-              Estimate Std. Error z value Pr(>|z|)    
-(Intercept) -1.193e+01  5.158e-01 -23.128   <2e-16 ***
-age          6.009e-02  6.696e-03   8.974   <2e-16 ***
-sex1         9.034e-01  1.011e-01   8.935   <2e-16 ***
-bmi          1.477e-01  8.475e-03  17.423   <2e-16 ***
-PC1          6.192e-04  7.374e-04   0.840   0.4010    
-PC2         -3.439e-03  1.397e-03  -2.461   0.0138 *  
-PC3          5.052e-03  2.458e-03   2.055   0.0399 *  
-PC4          7.124e-03  4.344e-03   1.640   0.1010    
-PC5          3.903e-04  6.478e-03   0.060   0.9520    
-PC6          6.370e-03  7.676e-03   0.830   0.4067    
-PC7          4.457e-03  9.105e-03   0.490   0.6245    
-PC8          8.770e-03  9.232e-03   0.950   0.3422    
-PC9          1.486e-02  1.207e-02   1.232   0.2181    
-PC10        -8.627e-03  8.534e-03  -1.011   0.3121    
-PRS          9.680e-01  9.405e-02  10.292   <2e-16 ***
+              Estimate Std. Error  z value Pr(>|z|)    
+(Intercept) -1.319e+01  7.934e-02 -166.246  < 2e-16 ***
+age          7.679e-02  1.016e-03   75.561  < 2e-16 ***
+sex1         7.389e-01  1.450e-02   50.962  < 2e-16 ***
+bmi          1.753e-01  1.272e-03  137.859  < 2e-16 ***
+PC1          2.375e-03  1.051e-04   22.594  < 2e-16 ***
+PC2         -6.423e-03  2.095e-04  -30.658  < 2e-16 ***
+PC3          8.010e-03  3.735e-04   21.444  < 2e-16 ***
+PC4          6.571e-03  6.329e-04   10.384  < 2e-16 ***
+PC5         -2.060e-04  9.513e-04   -0.217 0.828540    
+PC6         -2.149e-03  1.409e-03   -1.526 0.127024    
+PC7          5.396e-03  1.412e-03    3.821 0.000133 ***
+PC8         -1.985e-03  1.514e-03   -1.311 0.189786    
+PC9          3.407e-03  1.588e-03    2.145 0.031930 *  
+PC10         4.726e-03  1.345e-03    3.513 0.000442 ***
+PRS          1.269e+00  2.427e-02   52.277  < 2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 (Dispersion parameter for binomial family taken to be 1)
 
-    Null deviance: 4032.6  on 9978  degrees of freedom
-Residual deviance: 3413.1  on 9964  degrees of freedom
-AIC: 3443.1
+    Null deviance: 188697  on 440756  degrees of freedom
+Residual deviance: 156500  on 440742  degrees of freedom
+AIC: 156530
 
 Number of Fisher Scoring iterations: 6
 
 Setting levels: control = 0, case = 1
 Setting direction: controls < cases
 GLM output for validn dataset:
-  estimate  std_error   zvalue       pvalue       auc
-1 0.967991 0.09404852 10.29246 7.620144e-25 0.8024874
+  estimate  std_error   zvalue pvalue       auc
+1 1.268654 0.02426788 52.27708      0 0.8155592
 [1] "Calculating pseudo-R2:"
 [1] "Full model (with PRS):"
 Logistic Regression Model
  
  lrm(formula = Y ~ ., data = glm_df)
  
-                        Model Likelihood    Discrimination    Rank Discrim.    
-                              Ratio Test           Indexes          Indexes    
- Obs          9979    LR chi2     619.57    R2       0.181    C       0.802    
-  0           9468    d.f.            14    g        1.321    Dxy     0.605    
-  1            511    Pr(> chi2) <0.0001    gr       3.747    gamma   0.606    
- max |deriv| 6e-12                          gp       0.057    tau-a   0.059    
-                                            Brier    0.045                     
+                          Model Likelihood    Discrimination    Rank Discrim.    
+                                Ratio Test           Indexes          Indexes    
+ Obs         440757    LR chi2    32197.27    R2       0.202    C       0.816    
+  0          416348    d.f.             14    g        1.387    Dxy     0.631    
+  1           24409    Pr(> chi2)  <0.0001    gr       4.004    gamma   0.632    
+ max |deriv|  9e-10                           gp       0.063    tau-a   0.066    
+                                              Brier    0.047                     
  
-           Coef     S.E.   Wald Z Pr(>|Z|)
- Intercept -11.9286 0.5158 -23.13 <0.0001 
- age         0.0601 0.0067   8.97 <0.0001 
- sex=1       0.9034 0.1011   8.93 <0.0001 
- bmi         0.1477 0.0085  17.42 <0.0001 
- PC1         0.0006 0.0007   0.84 0.4010  
- PC2        -0.0034 0.0014  -2.46 0.0139  
- PC3         0.0051 0.0025   2.06 0.0399  
- PC4         0.0071 0.0043   1.64 0.1010  
- PC5         0.0004 0.0065   0.06 0.9520  
- PC6         0.0064 0.0077   0.83 0.4067  
- PC7         0.0045 0.0091   0.49 0.6245  
- PC8         0.0088 0.0092   0.95 0.3422  
- PC9         0.0149 0.0121   1.23 0.2181  
- PC10       -0.0086 0.0085  -1.01 0.3121  
- PRS         0.9680 0.0941  10.29 <0.0001 
+           Coef     S.E.   Wald Z  Pr(>|Z|)
+ Intercept -13.1893 0.0793 -166.23 <0.0001 
+ age         0.0768 0.0010   75.55 <0.0001 
+ sex=1       0.7389 0.0145   50.96 <0.0001 
+ bmi         0.1753 0.0013  137.85 <0.0001 
+ PC1         0.0024 0.0001   22.59 <0.0001 
+ PC2        -0.0064 0.0002  -30.66 <0.0001 
+ PC3         0.0080 0.0004   21.44 <0.0001 
+ PC4         0.0066 0.0006   10.38 <0.0001 
+ PC5        -0.0002 0.0010   -0.22 0.8285  
+ PC6        -0.0021 0.0014   -1.53 0.1271  
+ PC7         0.0054 0.0014    3.82 0.0001  
+ PC8        -0.0020 0.0015   -1.31 0.1898  
+ PC9         0.0034 0.0016    2.15 0.0319  
+ PC10        0.0047 0.0013    3.51 0.0004  
+ PRS         1.2687 0.0243   52.27 <0.0001 
  
 [1] "Reduced model (without PRS):"
 Logistic Regression Model
  
  lrm(formula = Y ~ ., data = glm_df %>% select(-PRS))
  
-                        Model Likelihood    Discrimination    Rank Discrim.    
-                              Ratio Test           Indexes          Indexes    
- Obs          9979    LR chi2     510.78    R2       0.150    C       0.778    
-  0           9468    d.f.            13    g        1.164    Dxy     0.556    
-  1            511    Pr(> chi2) <0.0001    gr       3.204    gamma   0.557    
- max |deriv| 9e-06                          gp       0.052    tau-a   0.054    
-                                            Brier    0.045                     
+                          Model Likelihood    Discrimination    Rank Discrim.    
+                                Ratio Test           Indexes          Indexes    
+ Obs         440757    LR chi2    29438.98    R2       0.186    C       0.804    
+  0          416348    d.f.             13    g        1.301    Dxy     0.608    
+  1           24409    Pr(> chi2)  <0.0001    gr       3.672    gamma   0.608    
+ max |deriv|  5e-10                           gp       0.061    tau-a   0.064    
+                                              Brier    0.048                     
  
-           Coef     S.E.   Wald Z Pr(>|Z|)
- Intercept -11.1347 0.4998 -22.28 <0.0001 
- age         0.0594 0.0066   8.97 <0.0001 
- sex=1       0.8834 0.1001   8.82 <0.0001 
- bmi         0.1455 0.0083  17.47 <0.0001 
- PC1         0.0042 0.0006   6.46 <0.0001 
- PC2        -0.0066 0.0014  -4.87 <0.0001 
- PC3         0.0082 0.0024   3.41 0.0006  
- PC4        -0.0010 0.0042  -0.24 0.8107  
- PC5        -0.0039 0.0064  -0.61 0.5414  
- PC6         0.0069 0.0077   0.90 0.3682  
- PC7         0.0041 0.0090   0.46 0.6475  
- PC8         0.0061 0.0091   0.66 0.5065  
- PC9         0.0132 0.0118   1.11 0.2664  
- PC10       -0.0087 0.0085  -1.02 0.3063  
+           Coef     S.E.   Wald Z  Pr(>|Z|)
+ Intercept -12.7238 0.0777 -163.68 <0.0001 
+ age         0.0757 0.0010   75.02 <0.0001 
+ sex=1       0.7280 0.0144   50.51 <0.0001 
+ bmi         0.1723 0.0013  137.32 <0.0001 
+ PC1         0.0036 0.0001   35.62 <0.0001 
+ PC2        -0.0068 0.0002  -32.60 <0.0001 
+ PC3         0.0096 0.0004   25.99 <0.0001 
+ PC4         0.0024 0.0006    3.91 <0.0001 
+ PC5        -0.0015 0.0009   -1.62 0.1057  
+ PC6        -0.0021 0.0014   -1.49 0.1350  
+ PC7         0.0060 0.0014    4.32 <0.0001 
+ PC8        -0.0014 0.0015   -0.91 0.3624  
+ PC9         0.0027 0.0016    1.73 0.0829  
+ PC10        0.0044 0.0013    3.32 0.0009  
  
-Proportion of variance explained by PRS using Nagelkerke’s pseudo-R2 metric = 0.03098679 
-Proportion of cases = 0.05120754 
-mean PRS for controls = 0.56418 
-mean PRS for cases = 0.884403 
+Proportion of variance explained by PRS using Nagelkerke’s pseudo-R2 metric = 0.01675568 
+Proportion of cases = 0.05537972 
+Warning in mean.default(glm_df[glm_df$Y == 0, "PRS"]) :
+  argument is not numeric or logical: returning NA
+mean PRS for controls = NA 
+Warning in mean.default(glm_df[glm_df$Y == 1, "PRS"]) :
+  argument is not numeric or logical: returning NA
+mean PRS for cases = NA 
 [1] "Anova of PRS ~ Y :"
-              Df Sum Sq Mean Sq F value Pr(>F)    
-Y              1     50   49.72   152.2 <2e-16 ***
-Residuals   9977   3258    0.33                   
+                Df Sum Sq Mean Sq F value Pr(>F)    
+Y                1    278  277.65    3150 <2e-16 ***
+Residuals   440755  38853    0.09                   
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 `summarise()` ungrouping output (override with `.groups` argument)
@@ -287,33 +299,33 @@ PRS dataframe for test dataset:
  $ epr_number    : num  100663 100797 100926 101095 101207 ...
  $ age_derived   : num  81 72 69 52 59 32 82 74 76 74 ...
  $ gender        : Factor w/ 2 levels "0","1": 2 2 2 1 1 1 1 2 2 2 ...
- $ he_bmi_derived: num  33 27.3 23.4 32.9 35.2 22 27.3 21 33.2 26.6 ...
  $ race          : Factor w/ 6 levels "1","2","3","4",..: 5 5 5 5 5 5 5 5 5 5 ...
+ $ he_bmi_derived: num  33 27.3 23.4 32.9 35.2 22 27.3 21 33.2 26.6 ...
  $ Y             : Factor w/ 2 levels "0","1": 2 1 1 1 1 1 1 1 1 1 ...
- $ PRS           : num  0.899 2.229 1.165 0.703 0.706 ...
+ $ PRS           : num  0.421 0.841 0.525 0.539 0.538 ...
 [1] "Test survey data after recoding race:"
 'data.frame':	3017 obs. of  8 variables:
  $ Sample_ID     : chr  "SM-IXVUB" "SM-IXVUC" "SM-IXVUD" "SM-IXVUE" ...
  $ epr_number    : num  100663 100797 100926 101095 101207 ...
  $ age_derived   : num  81 72 69 52 59 32 82 74 76 74 ...
  $ gender        : Factor w/ 2 levels "0","1": 2 2 2 1 1 1 1 2 2 2 ...
- $ he_bmi_derived: num  33 27.3 23.4 32.9 35.2 22 27.3 21 33.2 26.6 ...
  $ race          : Factor w/ 3 levels "other","black",..: 3 3 3 3 3 3 3 3 3 3 ...
+ $ he_bmi_derived: num  33 27.3 23.4 32.9 35.2 22 27.3 21 33.2 26.6 ...
  $ Y             : Factor w/ 2 levels "0","1": 2 1 1 1 1 1 1 1 1 1 ...
- $ PRS           : num  0.899 2.229 1.165 0.703 0.706 ...
+ $ PRS           : num  0.421 0.841 0.525 0.539 0.538 ...
 [1] "In function do_glm() :"
 [1] "data frame for glm model:"
 'data.frame':	3017 obs. of  6 variables:
  $ age_derived   : num  81 72 69 52 59 32 82 74 76 74 ...
  $ gender        : Factor w/ 2 levels "0","1": 2 2 2 1 1 1 1 2 2 2 ...
- $ he_bmi_derived: num  33 27.3 23.4 32.9 35.2 22 27.3 21 33.2 26.6 ...
  $ race          : Factor w/ 3 levels "other","black",..: 3 3 3 3 3 3 3 3 3 3 ...
+ $ he_bmi_derived: num  33 27.3 23.4 32.9 35.2 22 27.3 21 33.2 26.6 ...
  $ Y             : Factor w/ 2 levels "0","1": 2 1 1 1 1 1 1 1 1 1 ...
- $ PRS           : num  0.899 2.229 1.165 0.703 0.706 ...
+ $ PRS           : num  0.421 0.841 0.525 0.539 0.538 ...
 NULL
 [1] "Fitting GLM model:"
-Y ~ age_derived + gender + he_bmi_derived + race + PRS
-<environment: 0xb434d80>
+Y ~ age_derived + gender + race + he_bmi_derived + PRS
+<environment: 0x9f0a298>
 [1] "GLM model summary:"
 
 Call:
@@ -322,25 +334,25 @@ glm(formula = glm_formula, family = "binomial", data = glm_df,
 
 Deviance Residuals: 
     Min       1Q   Median       3Q      Max  
--2.0498  -0.4531  -0.3085  -0.1921   3.1329  
+-1.8858  -0.4517  -0.3097  -0.1926   3.1228  
 
 Coefficients:
                 Estimate Std. Error z value Pr(>|z|)    
-(Intercept)    -8.447092   0.580817 -14.543  < 2e-16 ***
-age_derived     0.049276   0.005606   8.790  < 2e-16 ***
-gender1        -0.008463   0.148015  -0.057 0.954406    
-he_bmi_derived  0.101450   0.008910  11.386  < 2e-16 ***
-raceblack       0.232603   0.329085   0.707 0.479680    
-racewhite      -0.389420   0.319939  -1.217 0.223540    
-PRS             0.464678   0.126670   3.668 0.000244 ***
+(Intercept)    -8.113584   0.558136 -14.537  < 2e-16 ***
+age_derived     0.048896   0.005599   8.733  < 2e-16 ***
+gender1        -0.008356   0.148132  -0.056 0.955015    
+raceblack       0.273512   0.329826   0.829 0.406956    
+racewhite      -0.586816   0.314134  -1.868 0.061756 .  
+he_bmi_derived  0.100937   0.008897  11.345  < 2e-16 ***
+PRS             0.863253   0.235407   3.667 0.000245 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 (Dispersion parameter for binomial family taken to be 1)
 
     Null deviance: 1846.1  on 3016  degrees of freedom
-Residual deviance: 1564.5  on 3010  degrees of freedom
-AIC: 1578.5
+Residual deviance: 1564.4  on 3010  degrees of freedom
+AIC: 1578.4
 
 Number of Fisher Scoring iterations: 6
 
@@ -348,7 +360,7 @@ Setting levels: control = 0, case = 1
 Setting direction: controls < cases
 GLM output for test dataset:
    estimate std_error   zvalue       pvalue       auc
-1 0.4646777 0.1266698 3.668417 0.0002440573 0.7881433
+1 0.8632534 0.2354074 3.667061 0.0002453541 0.7881776
 [1] "Calculating pseudo-R2:"
 [1] "Full model (with PRS):"
 Logistic Regression Model
@@ -357,20 +369,20 @@ Logistic Regression Model
  
                         Model Likelihood    Discrimination    Rank Discrim.    
                               Ratio Test           Indexes          Indexes    
- Obs          3017    LR chi2     281.66    R2       0.195    C       0.788    
-  0           2741    d.f.             6    g        1.285    Dxy     0.576    
-  1            276    Pr(> chi2) <0.0001    gr       3.616    gamma   0.577    
+ Obs          3017    LR chi2     281.71    R2       0.195    C       0.788    
+  0           2741    d.f.             6    g        1.282    Dxy     0.576    
+  1            276    Pr(> chi2) <0.0001    gr       3.606    gamma   0.577    
  max |deriv| 1e-06                          gp       0.093    tau-a   0.096    
                                             Brier    0.074                     
  
                 Coef    S.E.   Wald Z Pr(>|Z|)
- Intercept      -8.4471 0.5808 -14.54 <0.0001 
- age_derived     0.0493 0.0056   8.79 <0.0001 
- gender=1       -0.0085 0.1480  -0.06 0.9544  
- he_bmi_derived  0.1015 0.0089  11.39 <0.0001 
- race=black      0.2326 0.3291   0.71 0.4797  
- race=white     -0.3894 0.3199  -1.22 0.2235  
- PRS             0.4647 0.1267   3.67 0.0002  
+ Intercept      -8.1136 0.5581 -14.54 <0.0001 
+ age_derived     0.0489 0.0056   8.73 <0.0001 
+ gender=1       -0.0084 0.1481  -0.06 0.9550  
+ race=black      0.2735 0.3298   0.83 0.4070  
+ race=white     -0.5868 0.3141  -1.87 0.0618  
+ he_bmi_derived  0.1009 0.0089  11.35 <0.0001 
+ PRS             0.8633 0.2354   3.67 0.0002  
  
 [1] "Reduced model (without PRS):"
 Logistic Regression Model
@@ -389,18 +401,18 @@ Logistic Regression Model
  Intercept      -7.7748 0.5459 -14.24 <0.0001 
  age_derived     0.0488 0.0056   8.76 <0.0001 
  gender=1       -0.0108 0.1475  -0.07 0.9419  
- he_bmi_derived  0.0996 0.0088  11.28 <0.0001 
  race=black      0.4337 0.3270   1.33 0.1847  
  race=white     -0.6579 0.3138  -2.10 0.0360  
+ he_bmi_derived  0.0996 0.0088  11.28 <0.0001 
  
-Proportion of variance explained by PRS using Nagelkerke’s pseudo-R2 metric = 0.00889997 
+Proportion of variance explained by PRS using Nagelkerke’s pseudo-R2 metric = 0.008928583 
 Proportion of cases = 0.0914816 
-mean PRS for controls = 0.7847794 
-mean PRS for cases = 1.077084 
+mean PRS for controls = 0.2591596 
+mean PRS for cases = 0.37189 
 [1] "Anova of PRS ~ Y :"
               Df Sum Sq Mean Sq F value   Pr(>F)    
-Y              1   21.4  21.425   49.35 2.63e-12 ***
-Residuals   3015 1308.9   0.434                     
+Y              1   3.19   3.187   33.66 7.26e-09 ***
+Residuals   3015 285.48   0.095                     
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 `summarise()` ungrouping output (override with `.groups` argument)

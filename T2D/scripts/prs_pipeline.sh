@@ -20,8 +20,7 @@ echo "PRS pipeline for phenotype 'Type 2 Diabetes' initiated"
 sbatch --output=$PRS_PHENO_DIR/logs/setup_LDrefpanel.log $PRS_COMMON_DIR/scripts/setup_LDrefpanel.sh
 
 # QC and setup the validation dataset.
-# diabetes = f.2443.0.0 in the UK Biobank data
-sbatch --output=$PRS_PHENO_DIR/logs/setup_validn_data.log $PRS_COMMON_DIR/scripts/setup_validn_data.sh --pheno "f.2443.0.0"
+sbatch --output=$PRS_PHENO_DIR/logs/setup_validn_data.log $PRS_COMMON_DIR/scripts/setup_validn_data.sh --pheno "T2D"
 
 # QC and setup the test dataset.
 sbatch --output=$PRS_PHENO_DIR/logs/setup_test_data.log $PRS_COMMON_DIR/scripts/setup_test_data.sh --pheno he_c022_diabetes_PARQ

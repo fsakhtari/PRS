@@ -30,6 +30,13 @@ opts_spec <- list(
     default = NULL,
     help = "Variable name in the EPR H&E Survey data of the phenotype for which to compute PRS",
     metavar = "character"
+  ),
+
+  make_option(c("--covariates"),
+    type = "character",
+    default = c("age_derived", "gender", "race", "he_bmi_derived"),
+    help = "covariates to use in the association analysis [default \"%default\"]",
+    metavar = "character vector"
   )
 )
 opts <- get_opts(opts_spec)
@@ -43,42 +50,41 @@ opts <- get_opts(opts_spec)
 test_out_dir <- paste0(PRS_PHENO_DIR, "/derived_data/test_data/")
 
 # EPR H&E Survey data - loads epr.he & epr.he.meta
-load("/ddn/gs1/project/controlled/EPR/data_S3/Surveys/Health and Exposure/healthexposure_02jan20_v04.RData")
+load(paste0(PEGS_DIR, "/Data_Freezes/freeze_v1/Surveys/Health_and_Exposure/healthexposure_02jan20_v1.RData"))
+# Convert the columns in the EPR data to appropriate variable type
+epr.he <- epr_convert_type(epr.he, epr.he.meta)
 
 # EPR demographic data - loads epr.bcbb.map & epr.bcbb.map.meta
-load("/ddn/gs1/project/controlled/EPR/data_S3/MAP Data/bcbb_map_02jan20_v05.RData")
-
-# TODO: get this info from the map file
-# Link file linking the EPR participant numbers to the WGS plink IIDs
-# epr_broad_map <- read_excel('/ddn/gs1/project/nextgen/controlled/wgsepr/Contolled/plink/Burkholder_WGSDemographicsV2IF_03172020.xlsx')
-epr_broad_map <- read.csv("/ddn/gs1/project/controlled/EPR/data_S3/WGS Data/WGS_ID_Key.csv")
-epr_broad_map <- epr_broad_map %>% select(-control_flag)
+load(paste0(PEGS_DIR, "/Data_Freezes/freeze_v1/Map/bcbb_map_02jan20_v1.RData"))
+# Convert the columns in the EPR data to appropriate variable type
+epr.bcbb.map <- epr_convert_type(epr.bcbb.map, epr.bcbb.map.meta)
 
 
 ## Phenotype and covariate data from EPR Surveys
 
 # Merge all data
 epr_survey_cc <- merge(epr.he, epr.bcbb.map, by = "epr_number")
-cat("dimensions (epr + map) =", nrow(epr_survey_cc), "\n")
-epr_survey_cc <- merge(epr_survey_cc, epr_broad_map, by = "epr_number")
-cat("dimensions (epr_survey_cc + broad map) =", dim(epr_survey_cc), "\n")
-print(paste("number of unique epr ids", length(unique(epr_survey_cc$epr_number))))
-print(paste("number of unique broad ids", length(unique(epr_survey_cc$Sample_ID))))
+cat("Number of rows in merged EPR + Map data =", nrow(epr_survey_cc), "\n")
+epr_survey_cc <- epr_survey_cc %>% filter(broad_wgs_PARQ == 1)
+cat("Number of WGSed ppts =", nrow(epr_survey_cc), "\n")
 
 # Format the data as required + keep complete cases only
 epr_survey_cc <- epr_survey_cc %>%
-  select(c(
-    epr_number, Sample_ID, age_derived, gender, he_bmi_derived, race, opts$pheno
-  )) %>%
+  select(c(epr_number, broad_wgs_sample_id_CHILDQ, opts$covariates, opts$pheno)) %>%
+  rename(Sample_ID = broad_wgs_sample_id_CHILDQ) %>%
   rename(Y = !!opts$pheno) %>%
-  replace_with_na_all(condition = ~ .x %in% EPR_NA_STRINGS) %>%
-  drop_na() %>%
-  mutate(Sample_ID = as.character(Sample_ID)) %>%
-  mutate_at(vars(epr_number, age_derived, he_bmi_derived), as.numeric) %>%
-  mutate_at(vars(gender, Y, race), as.factor)
+  mutate(Y = as.factor(Y)) %>%
+  drop_na()
 
 print("EPR survey data (complete cases):")
 str(epr_survey_cc)
+
+print(paste(
+  "number of unique epr ids =", length(unique(epr_survey_cc$epr_number))
+))
+print(paste(
+  "number of unique WGS sample ids =", length(unique(epr_survey_cc$Sample_ID))
+))
 
 # Save the WGS IDs for complete cases in plink's required format
 indivs_keep <- paste0(test_out_dir, "indivs.keep")

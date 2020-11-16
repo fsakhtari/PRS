@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --mem=50g
+#SBATCH --mem=100g
 #SBATCH --partition=discovery
 #SBATCH --mail-user=akhtarifs
 #SBATCH --mail-type=END, FAIL
