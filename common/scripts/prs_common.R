@@ -12,7 +12,7 @@ if (!"librarian" %in% rownames(installed.packages())) {
 }
 library(librarian)
 librarian::shelf(
-  privefl/bigsnpr, data.table, naniar, optparse, pROC, rms, RColorBrewer,
+  privefl / bigsnpr, data.table, naniar, optparse, pROC, rms, RColorBrewer,
   tictoc, tidyverse, ukbtools, wrapr
 )
 
@@ -22,12 +22,14 @@ librarian::shelf(
 
 # The main PEGS directory
 PEGS_DIR <- "/ddn/gs1/project/controlled/PEGS"
+# The PEGS freeze 1 directory
+PEGS_F1_DIR <- "/ddn/gs1/project/controlled/PEGS/Data_Staging_Area/Freeze 1 Surveys with Age at Completion"
 
 # special codes
 EPR_NA_STRINGS <- qc(.M, .S, -444444, -555555, -666666, -777777, -888888, -999999)
 
 # TODO: pass this through the slurm file as cmdline arg so that you dont exceed
-# number of cores per node
+# the number of cores per node
 # Number of cores
 NCORES <- nb_cores()
 print(paste("num cores available = ", NCORES))
@@ -57,8 +59,7 @@ get_opts <- function(opts_spec) {
   if (missing_opts) {
     stop("Required command-line options to script are missing.")
     print_help(opt_parser)
-  }
-  else {
+  } else {
     return(opts)
   }
 }
@@ -80,6 +81,7 @@ epr_convert_type <- function(epr_df, epr_df_meta) {
     epr_df[[col]] <- switch(true_class,
       "numeric" = as.numeric(epr_df[[col]]),
       # coding binary as factor so that we can check the minimum n per level
+      # may be better as logical? but how to convert?
       "binary" = as.factor(epr_df[[col]]),
       "character" = as.character(epr_df[[col]]),
       "factor" = as.factor(epr_df[[col]]),
@@ -112,7 +114,7 @@ do_glm <- function(glm_df, plot_file = NULL) {
     select(-c(Y, PRS)) %>%
     colnames()
 
-  # order of covars does not matter, just put all covars
+  # Order of covars does not matter, just put all covars
   # Model formula
   glm_formula <- as.formula(paste("Y ~", paste(c(covars, "PRS"), collapse = "+")))
   print("Fitting GLM model:")
@@ -161,15 +163,14 @@ check_sd <- function(x) {
   | (x["SDval"] < 0.05)
   | (x["SDtest"] < 0.05)) {
     keep <- FALSE
-  }
-  else {
+  } else {
     keep <- TRUE
   }
   return(keep)
 }
 
 
-# Define the phenotype in the validation data (UK Biobank data). Identify cases
+# Define the phenotype in the UK Biobank data (validation data). Identify cases
 # and controls for the specified disease/phenotype based on survey data and
 # disease-specific inclusion/exclusion criteria.
 prepare_ukb_phenotype <- function(ukb_data, phenotype) {
@@ -204,7 +205,7 @@ prepare_ukb_phenotype <- function(ukb_data, phenotype) {
     # Identify individuals with different subtypes:
     # (gets row numbers in the UK Biobank data for the matches)
 
-    # any diabetes
+    # Any diabetes
     ind_diabetes <- sort(unique(unlist(c(
       lapply(ukb_illness, function(x) which(x %in% 1220:1223)),
       lapply(ukb_ICD9, function(x) which(substr(x, 1, 3) == 250)),
@@ -231,13 +232,13 @@ prepare_ukb_phenotype <- function(ukb_data, phenotype) {
 
     ## Mark cases and controls
 
-    # initialize phenotype vector
+    # Initialize phenotype vector
     Y <- rep(0, nrow(ukb_data))
-    # exclude individuals with any diabetes subtype (from controls)
+    # Exclude individuals with any diabetes subtype (from controls)
     Y[ind_diabetes] <- NA
-    # mark individuals with T2D as cases
+    # Mark individuals with T2D as cases
     Y[ind_T2D] <- 1
-    # exclude individuals with T1D (from cases and controls)
+    # Exclude individuals with T1D (from cases and controls)
     Y[ind_T1D] <- NA
 
     cat("Phenotype = ", phenotype, "\n")
@@ -247,8 +248,130 @@ prepare_ukb_phenotype <- function(ukb_data, phenotype) {
     ukb_pheno_prepd <- data.frame(f.eid = ukb_data$f.eid, Y = Y)
 
     return(ukb_pheno_prepd)
-  }
-  else {
+  } else if (phenotype == "asthma") {
+    # TODO
+    stop("Asthma phenotype code TODO")
+    asthma <- "f.22127.0.0"
+  } else {
     stop("Unrecognized phenotype string : 'phenotype'")
   }
+}
+
+
+# Define the phenotype in the PEGS/EPR data (test data). Identify cases
+# and controls for the specified disease/phenotype based on survey data and
+# disease-specific inclusion/exclusion criteria.
+# Missing vs skipped responses for child questions are correctly accounted for
+# by examining the response for the parent question in the exclusion criteria.
+prepare_epr_phenotype <- function(epr_data, phenotype) {
+
+  print("in function prepare_epr_phenotype")
+  # Type 2 diabetes (T2D)
+  if (phenotype == "T2D") {
+    # Exclude participants unlikely to have Type 2 diabetes - i.e. those
+    # with gestational diabetes only or those who were diagnosed with diabetes
+    # at age < 20 (these are likely Type 1 diabetes ppts)
+    # epr_data <- epr_data %>%
+    #   mutate(Y = replace(
+    #     he_c022_diabetes_PARQ,
+    #     (he_c022e_diabetes_age_CHILDQ < 20 | he_c022a_diabetes_preg_CHILDQ == 1),
+    #     NA
+    #   ))
+
+    diabetes_exclusions <- epr_data %>%
+      filter(he_c022_diabetes_PARQ == 1) %>%
+      filter(he_c022e_diabetes_age_CHILDQ < 20
+             | is.na(he_c022e_diabetes_age_CHILDQ)) %>%
+      pull(epr_number)
+
+    diabetes_exclusions <- sort(unique(c(
+      diabetes_exclusions,
+      (epr_data %>%
+        filter(he_c022_diabetes_PARQ == 1
+               & .data[["_he_gender_"]] %in% c(1, NA)) %>%
+        filter(he_c022a_diabetes_preg_CHILDQ == 1
+               | is.na(he_c022a_diabetes_preg_CHILDQ)) %>%
+        pull(epr_number)))))
+
+    epr_data <- epr_data %>%
+      mutate(Y = replace(
+        he_c022_diabetes_PARQ,
+        epr_number %in% diabetes_exclusions,
+        NA
+      ))
+  } else if (phenotype == "prediabetes") {
+    # Exclude participants with likely different disease etiology, i.e. those
+    # who were diagnosed at age < 20
+    prediabetes_exclusions <- epr_data %>%
+      filter(he_c021_pre_diabetes_PARQ == 1) %>%
+      filter(he_c021a_pre_diabetes_age_CHILDQ < 20
+             | is.na(he_c021a_pre_diabetes_age_CHILDQ)) %>%
+      pull(epr_number)
+
+    epr_data <- epr_data %>%
+      mutate(Y = replace(
+        he_c021_pre_diabetes_PARQ,
+        epr_number %in% prediabetes_exclusions,
+        NA
+      ))
+  } else if (phenotype == "hypertension") {
+    # Female ppts with gestational hypertension only are treated as controls
+    hypertension_controls <- epr_data %>%
+      filter(he_b007_hypertension_PARQ == 1
+             & .data[["_he_gender_"]] %in% c(1, NA)) %>%
+      filter(he_b007a_hypertension_preg_CHILDQ == 1) %>%
+      pull(epr_number)
+
+    epr_data <- epr_data %>%
+      mutate(Y = replace(
+        he_b007_hypertension_PARQ,
+        epr_number %in% hypertension_controls,
+        0
+      ))
+  } else if (phenotype == "hypercholesterolemia") {
+    epr_data <- epr_data %>%
+      mutate(Y = he_b008_high_cholesterol)
+  } else if (phenotype == "asthma") {
+    # Exclude participants with COPD
+    epr_data <- epr_data %>%
+      mutate(Y = replace(
+        he_d030_asthma_PARQ,
+        he_d025_copd %in% c(1, NA),
+        NA
+      ))
+  } else {
+    print("did not match any phenotype")
+    stop(paste("Unrecognized phenotype string :"), phenotype)
+  }
+
+  # Create cases & controls dataframe
+  epr_pheno_prepd <- epr_data %>% select(epr_number, Y)
+  cat("Phenotype = ", phenotype, "\n")
+  print(table(epr_pheno_prepd$Y, exclude = NULL))
+
+  return(epr_pheno_prepd)
+}
+
+
+# Convert the specified label string from any PEGS metadata file to a named
+# character vector containing key-value pairs.
+create_label_vector <- function(labels) {
+
+  # Separate the multiple labels in the label string (at ';') and then separate each label into key and value pairs (at '=').
+  kv_pairs <- strsplit(unlist(str_split(labels, ";")), "=")
+
+  # Remove unwanted characters from the keys and values
+  kv_pairs <- lapply(kv_pairs, function(x) {x <- trimws(x); x <- gsub("(^')|('$)", "", x); return(x)})
+
+  # Convert to a two-column data frame with the keys in one column and the
+  # values in the other column.
+  kv.df <- do.call(rbind.data.frame, kv_pairs)
+  names(kv.df) <- c("key", "value")
+
+  # Convert to a named character vector containing key-value pairs
+  label_vector <- kv.df %>%
+    pmap(~set_names(..2, ..1)) %>%
+    unlist()
+
+  return(label_vector)
 }

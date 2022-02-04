@@ -29,10 +29,10 @@ opts_spec <- list(
 
   make_option(c("--covariates"),
     type = "list",
-    default = c(list(
+    default = c(pcs, list(
       age = "f.21022.0.0", sex = "f.31.0.0",
       ethnicity = "f.21000.0.0", bmi = "f.21001.0.0"
-    ), pcs),
+    )),
     help = "covariates to use in the association analysis specified in a named list of covariate names and their corresponding UIDs in the UK Biobank data [default \"%default\"]",
     metavar = "named list"
   )
@@ -119,6 +119,9 @@ gc()
 ## Genotype data
 
 # Filter genotype data + only keep genotype samples for complete cases
+# TODO: Do HWE test on controls only - to do this just specify the phenotype
+# in the plink files and the hwe option will only test this on controls -
+# https://zzz.bwh.harvard.edu/plink/thresh.shtml
 print("starting snp_plinkqc")
 bedfile <- snp_plinkQC(
   plink.path = "/ddn/gs1/home/akhtarifs/software/plink2",

@@ -23,6 +23,9 @@ PRS_PHENO_DIR <- Sys.getenv("PRS_PHENO_DIR")
 
 source(paste0(PRS_COMMON_DIR, "/scripts/prs_common.R"))
 
+# The first 10 genetic principal components to be included as covariates
+pcs <- paste0('PC', 1:40)
+
 # Retrieve command line arguments/options
 opts_spec <- list(
   make_option(c("--pheno"),
@@ -34,7 +37,7 @@ opts_spec <- list(
 
   make_option(c("--covariates"),
     type = "character",
-    default = c("age_derived", "gender", "race", "he_bmi_derived"),
+    default = c(pcs, "age_derived", "gender", "race", "he_bmi_derived"),
     help = "covariates to use in the association analysis [default \"%default\"]",
     metavar = "character vector"
   )
@@ -59,21 +62,40 @@ load(paste0(PEGS_DIR, "/Data_Freezes/freeze_v1/Map/bcbb_map_02jan20_v1.RData"))
 # Convert the columns in the EPR data to appropriate variable type
 epr.bcbb.map <- epr_convert_type(epr.bcbb.map, epr.bcbb.map.meta)
 
+# Eigen vector values for the WGSed EPR ppts computed using PCA
+epr.pcs <- read.table("/ddn/gs1/project/nextgen/controlled/wgsepr/Contolled/plink/final_4768_confirmed_filtered_nocontrols_LD_pruned_unrelated.eigenvec",
+  header = FALSE,
+  quote = ""
+)
+colnames(epr.pcs) <- c("FID", "IID", paste0('PC', 1:(ncol(epr.pcs) - 2)))
+
 
 ## Phenotype and covariate data from EPR Surveys
 
 # Merge all data
-epr_survey_cc <- merge(epr.he, epr.bcbb.map, by = "epr_number")
-cat("Number of rows in merged EPR + Map data =", nrow(epr_survey_cc), "\n")
-epr_survey_cc <- epr_survey_cc %>% filter(broad_wgs_PARQ == 1)
-cat("Number of WGSed ppts =", nrow(epr_survey_cc), "\n")
+epr_data <- merge(epr.he, epr.bcbb.map, by = "epr_number")
+cat("Number of rows in merged EPR H&E + Map data =", nrow(epr_data), "\n")
+epr_data <- merge(epr_data, epr.pcs,
+  by.x = "broad_wgs_sample_id_CHILDQ",
+  by.y = "IID"
+)
+cat("Number of rows in merged EPR H&E + Map + PCA data =", nrow(epr_data),
+ "\n")
+epr_data <- epr_data %>% filter(broad_wgs_PARQ == 1)
+cat("Number of WGSed ppts =", nrow(epr_data), "\n")
+
+# Identify cases and controls for the specified phenotype/disease
+epr_pheno_prepd <- prepare_epr_phenotype(
+  epr_data = epr_data, phenotype = opts$pheno
+)
+epr_data <- merge(epr_data, epr_pheno_prepd, by = "epr_number")
 
 # Format the data as required + keep complete cases only
-epr_survey_cc <- epr_survey_cc %>%
-  select(c(epr_number, broad_wgs_sample_id_CHILDQ, opts$covariates, opts$pheno)) %>%
+epr_survey_cc <- epr_data %>%
+  select(c(epr_number, broad_wgs_sample_id_CHILDQ, Y, opts$covariates)) %>%
   rename(Sample_ID = broad_wgs_sample_id_CHILDQ) %>%
-  rename(Y = !!opts$pheno) %>%
-  mutate(Y = as.factor(Y)) %>%
+  # Currently, the EPR data has some invalid BMI values, drop these ppts
+  filter(he_bmi_derived >= 15) %>%
   drop_na()
 
 print("EPR survey data (complete cases):")
@@ -97,11 +119,15 @@ write.table(
 ## Genotype data
 
 # Filter genotype data + only keep genotype samples for complete cases
+# TODO: With inclusion/exclusion criteria dataset, do HWE test on controls
+# only - to do this just specify the phenotype in the plink files and the hwe
+# option will only test this on controls -
+# https://zzz.bwh.harvard.edu/plink/thresh.shtml
 bedfile <- snp_plinkQC(
   plink.path = "/ddn/gs1/home/akhtarifs/software/plink2",
-  prefix.in = "/ddn/gs1/project/nextgen/controlled/wgsepr/Contolled/plink/all_confirmed_filtered",
+  prefix.in = "/ddn/gs1/project/nextgen/controlled/wgsepr/Contolled/plink/final_4768_confirmed_filtered_nocontrols_unrelated",
   prefix.out = paste0(test_out_dir, "epr_geno"),
-  maf = 0.01, geno = 0.01, mind = 0.1, hwe = 1e-10, autosome.only = TRUE,
+  maf = 0.01, geno = 0.05, mind = 0.1, hwe = 1e-10, autosome.only = TRUE,
   extra.options = paste(" --snps-only --keep", indivs_keep)
 )
 

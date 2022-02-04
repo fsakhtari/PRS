@@ -109,17 +109,10 @@ compute_total_prs <- function(dataset_type) {
     row.names = FALSE, quote = FALSE
   )
 
-  # TODO: temporarily using race in lieu of PCs. Grouping race into 3 races.
-  if (dataset_type == "test") {
-    prs_total <- prs_total %>%
-      mutate(race = recode(race, `3` = "black", `5` = "white", .default = "other"))
-    print("Test survey data after recoding race:")
-    str(prs_total)
-  }
-
   # Remove columns not used in glm
-  remove_cols <- c("f.eid", "ethnicity", "epr_number", "Sample_ID")
+  remove_cols <- c("f.eid", "ethnicity", "epr_number", "Sample_ID", "race")
   glm_df <- prs_total %>% select(-any_of(remove_cols))
+  glm_df <- glm_df %>% select(-any_of(paste0('PC', 11:40)))
 
   # Logistic regression of phenotype (Y) ~ covariates + PRS
   glm_out <- do_glm(
@@ -167,6 +160,31 @@ compute_total_prs <- function(dataset_type) {
   plot_df$PRS_scaled <- scale(plot_df$PRS, scale = TRUE, center = TRUE)
   # PRS percentile
   plot_df$PRS_ptile <- ntile(plot_df$PRS, 100)
+  # PRS levels - low, med, high
+  plot_df <- plot_df %>% mutate(PRS_level = case_when(
+    PRS_ptile < 25                    ~ "low",
+    PRS_ptile >= 25 & PRS_ptile <= 75 ~ "med",
+    PRS_ptile > 75                    ~ "high",
+    TRUE ~ NA_character_
+  ))
+
+  write.table(plot_df,
+    paste0(PRS_PHENO_DIR, "/output/", dataset_type, "_prs_plot_df.txt"),
+    row.names = FALSE, quote = FALSE
+  )
+  save.image(file = paste0(PRS_PHENO_DIR, "/output/", dataset_type,
+   "_data.RData"))
+
+  print("Number of ppts & cases in each PRS level:")
+  plot_df %>%
+    group_by(PRS_level) %>%
+    summarise(
+      N = n(),
+      N_percent = (N/nrow(.))*100,
+      N_cases = sum(as.numeric(levels(Y))[Y]),
+      percent_cases = mean(as.numeric(levels(Y))[Y])
+    ) %>%
+  print()
 
   # Density plot to show PRS distribution
   print(
